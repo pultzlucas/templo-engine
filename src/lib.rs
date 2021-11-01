@@ -18,7 +18,8 @@ mod tests {
     use super::*;
     // UPPER_FIRST($oi1, $oi2, FN2($oi3, $oi4))
     // LOWER(FN($var2, $var3), $eae, JOIN($var4)))
-    const INPUT: &'static str = "UPPER(LOWER(FN($var2, $var3), $eae, JOIN($var4))))";
+    // (join $var1 $var2)
+    const INPUT: &'static str = "UPPER(LOWER(FN($a)))";
 
     #[test]
     fn parser_test() {
