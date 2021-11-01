@@ -1,11 +1,11 @@
+mod expression;
+mod expressions;
 mod functions;
 mod lexer;
-mod token;
-mod expressions;
-mod utils;
-mod expression;
 mod parser;
 mod syntax_tree;
+mod token;
+mod utils;
 
 pub fn compile(input: String) -> Result<String, std::io::Error> {
     let _tokens = lexer::lex(input);
@@ -16,11 +16,15 @@ pub fn compile(input: String) -> Result<String, std::io::Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const INPUT: &'static str = "UPPER($var1, LOWER($var3, $var4), $var2))";
-    
+    // UPPER_FIRST($oi1, $oi2, FN2($oi3, $oi4))
+    // LOWER(FN($var2, $var3), $eae, JOIN($var4)))
+    const INPUT: &'static str = "UPPER(LOWER(FN($var2, $var3), $eae, JOIN($var4))))";
+
     #[test]
     fn parser_test() {
         let tokens = lexer::lex(INPUT.to_string());
-        parser::parse(tokens);
+        let tree = parser::parse(tokens);
+        let json = serde_json::to_string_pretty(&tree).unwrap();
+        println!("{}", json);
     }
 }

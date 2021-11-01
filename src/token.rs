@@ -17,4 +17,5 @@ pub enum TokenType {
     BracketRight,
     Comma,
     Input,
+    Null
 }

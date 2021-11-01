@@ -6,7 +6,7 @@ pub fn lex(input: String) -> Vec<Token> {
     let alphanum_reg = Regex::new(r"\w+").unwrap();
     let input_reg = Regex::new(r"\$\w+").unwrap();
 
-    let input = format!("{} ", input);
+    let input = format!("{}\0", input);
     let chars = input.chars().into_iter();
 
     let mut buffer = String::new();
@@ -15,7 +15,7 @@ pub fn lex(input: String) -> Vec<Token> {
     // loop to get the tokens
     for ch in chars {
         
-        let valid_symbols = ["(", ")", ",", "$", " "].join("");
+        let valid_symbols = ["(", ")", ",", "$", " ", "\0"].join("");
         let valid_chars_reg = Regex::new(&format!(r"[\w{}]", valid_symbols)).unwrap();
         
         if !valid_chars_reg.is_match(&ch.to_string()) {
