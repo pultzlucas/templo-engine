@@ -1,6 +1,6 @@
 use serde_derive::{Deserialize, Serialize};
 use std::ops::RangeFrom;
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum TreeType {
     FunctionCall,
     Input,
@@ -8,8 +8,8 @@ pub enum TreeType {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SyntaxTree {
-    node: String,
-    tree_type: TreeType,
+    pub node: String,
+    pub tree_type: TreeType,
     pub childs: Vec<SyntaxTree>,
 }
 
@@ -25,6 +25,10 @@ impl SyntaxTree {
     pub fn append_child(&mut self, child: SyntaxTree) -> &mut Self {
         self.childs.push(child);
         self
+    }
+
+    pub fn has_childs(&self) -> bool {
+        self.childs.len() > 0
     }
 
     pub fn get_childs(&mut self, range: RangeFrom<usize>) -> Vec<SyntaxTree> {

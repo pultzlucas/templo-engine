@@ -34,17 +34,23 @@ pub fn parse(tokens: Vec<Token>) -> SyntaxTree {
             last_layer = layer;
             layer -= 1;
 
-            if brothers[layer].layer == layer {
-                brothers.push(Brother { brothers: 0, layer });
-            }
-
             n_of_args -= brothers[layer].brothers;
+
+            println!("-- {} --", token.value);
+            println!("n_of_args -> {}", n_of_args);
+            println!("layer -> {}", layer);
+            println!("last_layer -> {}", last_layer);
+            println!("brothers -> {:?}", brothers);
+            println!("{:?}\n", tree);
+
             let range = (tree.childs.len() - n_of_args)..;
             let mut args: Vec<SyntaxTree> = tree.get_childs(range);
             args.reverse();
 
             let fun = SyntaxTree::new(token.value.clone(), TreeType::FunctionCall, args);
             tree.append_child(fun);
+
+            println!("{:?}\n", tree);
 
             n_of_args = brothers[layer].brothers;
             n_of_args += 1;
@@ -54,26 +60,29 @@ pub fn parse(tokens: Vec<Token>) -> SyntaxTree {
             let input = SyntaxTree::new(token.value.clone(), TreeType::Input, vec![]);
             tree.append_child(input);
 
-            if last_token.type_ == TokenType::Comma {
-                brothers[layer].brothers += 1;
-            } else {
+            if last_token.type_ == TokenType::BracketRight {
                 brothers.push(Brother { brothers: 0, layer });
             }
-
+            
+            if last_token.type_ == TokenType::Comma && brothers[layer].brothers > 0 {
+                brothers[layer].brothers += 1;
+            } 
+            println!("-- {} --", token.value);
+            println!("#{}", last_token.type_ == TokenType::Comma && brothers[layer].brothers > 0);
+            println!("brothers -> {:?}", brothers);
             n_of_args += 1;
         }
 
         if token.type_ == TokenType::BracketRight {
             if last_layer != layer {
-                n_of_args = 0;
+                n_of_args = brothers[last_layer].brothers;
             }
 
-            if last_token.type_ == TokenType::Comma {
-                brothers[layer].brothers += 1;
-            } else {
+            if last_token.type_ != TokenType::Comma {
                 brothers.push(Brother { brothers: 0, layer });
             }
-
+            
+            brothers[layer].brothers += 1;
             last_layer = layer;
             layer += 1;
         }
