@@ -40,7 +40,7 @@ pub fn parse(tokens: Vec<Token>, inputs: Vec<Input>) -> SyntaxTree {
             let input_value = inputs.iter().find(|input| input.key == token.value);
 
             if input_value.is_none() && inputs.len() > 0 {
-                panic!("{}", format!("Input '{}' is not informed.", input_value.unwrap().key));
+                panic!("{}", format!("Input '{}' is not informed.", token.value));
             }
 
             let input = SyntaxTree::new(input_value.unwrap().value.clone(), TreeType::Input, vec![]);
@@ -54,6 +54,8 @@ pub fn parse(tokens: Vec<Token>, inputs: Vec<Input>) -> SyntaxTree {
             let real_string_value = middle_quotes_reg.replace_all(value, "'");
 
             let input = SyntaxTree::new(real_string_value.to_string(), TreeType::Input, vec![]);
+            // println!("{:?}", input);
+
             tree.append_child(input);
             layer_args[layer].args += 1;
         }

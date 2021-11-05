@@ -31,7 +31,7 @@ pub fn compile(buffer: String, inputs: Vec<Input>) -> Result<String, std::io::Er
 #[cfg(test)]
 mod tests {
     use super::*;
-    const EXP: &'static str = r#"str(upper_first(name), ' ', upper_first('engine'), ' owyeah!')"#;
+    const EXP: &'static str = r#"str(upper_first(name), ' ', upper_first('engine'), ' ', upper_first('owyeah!'))"#;
     #[test]
     fn lib() {
         let inputs = vec![

@@ -4,7 +4,7 @@ use regex::Regex;
 pub fn lex(input: String) -> Vec<Token> {
     // REGEXES
     let alphanum_reg = Regex::new(r"^\s*\w+$").unwrap();
-    let string_reg = Regex::new(r"^\s*'.*[^(\\')].*'$").unwrap();
+    let string_reg = Regex::new(r"^\s*'.*[^(\\')]*.*'$").unwrap();
 
     let input = format!("{}\0", input);
     let chars = input.chars().into_iter();
@@ -50,7 +50,6 @@ pub fn lex(input: String) -> Vec<Token> {
             "(" => Some(Token::new(buffer.clone().trim().to_string(), TokenType::BracketLeft)),
             ")" => Some(Token::new(buffer.clone().trim().to_string(), TokenType::BracketRight)),
             "," => Some(Token::new(buffer.clone().trim().to_string(), TokenType::Separator)),
-            // "'" => Some(Token::new(buffer.clone(), TokenType::Quotes)),
             _ => None,
         };
 
