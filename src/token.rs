@@ -15,7 +15,9 @@ pub enum TokenType {
     Function,
     BracketLeft,
     BracketRight,
-    Comma,
+    Separator,
     Input,
-    Null
+    String
+    // Quotes,
+    // Eof
 }

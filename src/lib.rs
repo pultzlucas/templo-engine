@@ -22,7 +22,7 @@ mod tests {
     // LOWER(FN($var2, $var3), $eae, JOIN($var4)))
     // UPPER(LOWER(FN($a)))
     // (join $var1 $var2)
-    const INPUT: &'static str = "JOIN(UPPER_FIRST(templ_o), _)";
+    const INPUT: &'static str = r#"UPPER(JOIN('templo-engine', '-'))"#;
 
     #[test]
     fn lib() {
@@ -32,7 +32,7 @@ mod tests {
         // let _json = serde_json::to_string_pretty(&tree).unwrap();
         // println!("{}", _json);
         let _res = generator::generate(tree).unwrap();
-        // println!("{}", _res);
+        println!("{}", _res);
 
     }
 }

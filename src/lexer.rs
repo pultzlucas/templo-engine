@@ -3,7 +3,8 @@ use regex::Regex;
 
 pub fn lex(input: String) -> Vec<Token> {
     // REGEXES
-    let alphanum_reg = Regex::new(r"\w+").unwrap();
+    let alphanum_reg = Regex::new(r"^\w+$").unwrap();
+    let string_reg = Regex::new(r"^'.*[^(\\')].*'$").unwrap();
 
     let input = format!("{}\0", input);
     let chars = input.chars().into_iter();
@@ -14,12 +15,12 @@ pub fn lex(input: String) -> Vec<Token> {
     // loop to get the tokens
     for ch in chars {
         
-        let valid_symbols = ["(", ")", ",", "$", " ", "\0"].join("");
-        let valid_chars_reg = Regex::new(&format!(r"[\w{}]", valid_symbols)).unwrap();
+        // let valid_symbols = ["(", ")", ",", "$", " ", "\0"].join("");
+        // let valid_chars_reg = Regex::new(&format!(r"[\w{}]", valid_symbols)).unwrap();
         
-        if !valid_chars_reg.is_match(&ch.to_string()) {
-            panic!("Invalid char '{}'", ch);
-        }
+        // if !valid_chars_reg.is_match(&ch.to_string()) {
+        //     panic!("Invalid char '{}'", ch);
+        // }
 
         // Skip whitespace
         if ch == ' ' {
@@ -32,8 +33,14 @@ pub fn lex(input: String) -> Vec<Token> {
             buffer = String::new();
         }
 
+        // STRING
+        if string_reg.is_match(&buffer) && !buffer.ends_with(r"\'") {
+            tokens.push(Token::new(buffer.clone(), TokenType::String));
+            buffer = String::new();
+        }
+
         // INPUT
-        if alphanum_reg.is_match(&buffer) && !alphanum_reg.is_match(&ch.to_string()) {
+        if alphanum_reg.is_match(&buffer) && !alphanum_reg.is_match(&ch.to_string()) && ch != '\'' {
             tokens.push(Token::new(buffer.clone(), TokenType::Input));
             buffer = String::new();
         }
@@ -42,7 +49,8 @@ pub fn lex(input: String) -> Vec<Token> {
         let token = match buffer.as_str() {
             "(" => Some(Token::new(buffer.clone(), TokenType::BracketLeft)),
             ")" => Some(Token::new(buffer.clone(), TokenType::BracketRight)),
-            "," => Some(Token::new(buffer.clone(), TokenType::Comma)),
+            "," => Some(Token::new(buffer.clone(), TokenType::Separator)),
+            // "'" => Some(Token::new(buffer.clone(), TokenType::Quotes)),
             _ => None,
         };
 

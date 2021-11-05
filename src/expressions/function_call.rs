@@ -1,4 +1,3 @@
-use crate::expression::Expression;
 use crate::functions::{Join, Lower, OneParamFunction, TwoParamFunction, Upper, UpperFirst};
 use crate::token::{Token, TokenType};
 use crate::utils::errors::invalid_input_error;
@@ -95,7 +94,7 @@ mod test {
             },
             Token {
                 value: ",".to_string(),
-                type_: TokenType::Comma,
+                type_: TokenType::Separator,
             },
             Token {
                 value: " $variable2".to_string(),

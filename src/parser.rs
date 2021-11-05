@@ -1,5 +1,7 @@
 use std::vec;
 
+use regex::Regex;
+
 use crate::{
     syntax_tree::{SyntaxTree, TreeType},
     token::{Token, TokenType},
@@ -25,27 +27,30 @@ pub fn parse(tokens: Vec<Token>) -> SyntaxTree {
 
     for token in tokens_iter.rev() {
         if token.type_ == TokenType::Function {
-            // println!("-- {} --", token.value);
-            // println!("layer -> {}", layer);
-            // println!("layer_args -> {:?}", layer_args);
-            // println!("{:?}\n", tree);
-            
             let args = layer_args[layer].args;
             let range = (tree.childs.len() - args)..;
             let mut args: Vec<SyntaxTree> = tree.get_childs(range);
             args.reverse();
-            
+
             let fun = SyntaxTree::new(token.value.clone(), TreeType::FunctionCall, args);
             tree.append_child(fun);
-            
-            // println!("{:?}\n", tree);
-            
+
             layer -= 1;
             layer_args[layer].args += 1;
         }
 
         if token.type_ == TokenType::Input {
             let input = SyntaxTree::new(token.value.clone(), TreeType::Input, vec![]);
+            tree.append_child(input);
+            layer_args[layer].args += 1;
+        }
+
+        if token.type_ == TokenType::String {
+            let value = &token.value[1..token.value.len() - 1];
+            let middle_quotes_reg = Regex::new(r"\\'").unwrap();
+            let real_string_value = middle_quotes_reg.replace_all(value, "'");
+
+            let input = SyntaxTree::new(real_string_value.to_string(), TreeType::Input, vec![]);
             tree.append_child(input);
             layer_args[layer].args += 1;
         }
