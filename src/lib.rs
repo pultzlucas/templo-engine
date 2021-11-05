@@ -11,6 +11,7 @@ mod generator;
 pub fn compile(input: String) -> Result<String, std::io::Error> {
     let _tokens = lexer::lex(input);
     let _syntax_tree = parser::parse(_tokens);
+    let _res = generator::generate(_syntax_tree)?;
     Ok("".to_string())
 }
 
@@ -21,16 +22,17 @@ mod tests {
     // LOWER(FN($var2, $var3), $eae, JOIN($var4)))
     // UPPER(LOWER(FN($a)))
     // (join $var1 $var2)
-    const INPUT: &'static str = "UPPER($oi, UPPER_FIRST($arg1, JOIN($arg3), $arg2), $a, $b)";
+    const INPUT: &'static str = "JOIN(UPPER_FIRST(templ_o), _)";
 
     #[test]
     fn lib() {
         let tokens = lexer::lex(INPUT.to_string());
+        tokens.iter().for_each(|token| println!("{:?}", token));
         let tree = parser::parse(tokens);
-        let _json = serde_json::to_string_pretty(&tree).unwrap();
-        println!("{}", _json);
-        // let _res = generator::generate(tree).unwrap();
-        // println!("{}", res);
+        // let _json = serde_json::to_string_pretty(&tree).unwrap();
+        // println!("{}", _json);
+        let _res = generator::generate(tree).unwrap();
+        // println!("{}", _res);
 
     }
 }

@@ -6,9 +6,9 @@ use crate::{
 };
 
 #[derive(Debug)]
-struct Brother {
+struct Arg {
     layer: usize,
-    brothers: usize,
+    args: usize,
 }
 
 pub fn parse(tokens: Vec<Token>) -> SyntaxTree {
@@ -20,78 +20,45 @@ pub fn parse(tokens: Vec<Token>) -> SyntaxTree {
         vec![],
     );
 
-    let mut n_of_args = 0;
     let mut layer = 0;
-    let mut last_layer = 0;
-    let mut brothers: Vec<Brother> = vec![Brother {
-        layer: 0,
-        brothers: 0,
-    }];
-    let mut last_token = &Token::new("\0".to_string(), TokenType::Null);
+    let mut layer_args: Vec<Arg> = vec![Arg { layer: 0, args: 0 }];
 
     for token in tokens_iter.rev() {
         if token.type_ == TokenType::Function {
-            last_layer = layer;
-            layer -= 1;
-
-            n_of_args -= brothers[layer].brothers;
-
-            println!("-- {} --", token.value);
-            println!("n_of_args -> {}", n_of_args);
-            println!("layer -> {}", layer);
-            println!("last_layer -> {}", last_layer);
-            println!("brothers -> {:?}", brothers);
-            println!("{:?}\n", tree);
-
-            let range = (tree.childs.len() - n_of_args)..;
+            // println!("-- {} --", token.value);
+            // println!("layer -> {}", layer);
+            // println!("layer_args -> {:?}", layer_args);
+            // println!("{:?}\n", tree);
+            
+            let args = layer_args[layer].args;
+            let range = (tree.childs.len() - args)..;
             let mut args: Vec<SyntaxTree> = tree.get_childs(range);
             args.reverse();
-
+            
             let fun = SyntaxTree::new(token.value.clone(), TreeType::FunctionCall, args);
             tree.append_child(fun);
-
-            println!("{:?}\n", tree);
-
-            n_of_args = brothers[layer].brothers;
-            n_of_args += 1;
+            
+            // println!("{:?}\n", tree);
+            
+            layer -= 1;
+            layer_args[layer].args += 1;
         }
 
         if token.type_ == TokenType::Input {
             let input = SyntaxTree::new(token.value.clone(), TreeType::Input, vec![]);
             tree.append_child(input);
-
-            if last_token.type_ == TokenType::BracketRight {
-                brothers.push(Brother { brothers: 0, layer });
-            }
-            
-            if last_token.type_ == TokenType::Comma && brothers[layer].brothers > 0 {
-                brothers[layer].brothers += 1;
-            } 
-            println!("-- {} --", token.value);
-            println!("#{}", last_token.type_ == TokenType::Comma && brothers[layer].brothers > 0);
-            println!("brothers -> {:?}", brothers);
-            n_of_args += 1;
+            layer_args[layer].args += 1;
         }
 
         if token.type_ == TokenType::BracketRight {
-            if last_layer != layer {
-                n_of_args = brothers[last_layer].brothers;
-            }
-
-            if last_token.type_ != TokenType::Comma {
-                brothers.push(Brother { brothers: 0, layer });
-            }
-            
-            brothers[layer].brothers += 1;
-            last_layer = layer;
             layer += 1;
-        }
 
-        if token.type_ == TokenType::Comma {
-            last_layer = layer;
+            if layer_args.get(layer).is_none() {
+                layer_args.push(Arg { args: 0, layer })
+            } else {
+                layer_args[layer] = Arg { args: 0, layer }
+            }
         }
-
-        last_token = token;
     }
 
     tree.childs.reverse();

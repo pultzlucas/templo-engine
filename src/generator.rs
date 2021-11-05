@@ -9,12 +9,12 @@ pub fn generate(tree: SyntaxTree) -> Result<String, Error> {
 }
 
 fn execute_fn_tree(tree: &SyntaxTree) -> Result<String, Error> {
-    println!("{}", tree.node);
+    // println!("{}", tree.node);
 
     let mut args: Vec<String> = vec![];
 
     for child in tree.childs.iter() {
-        println!("child -> {:?}", child);
+        // println!("child -> {:?}", child);
         if child.tree_type == TreeType::FunctionCall {
             let fn_result = execute_fn_tree(child)?;
             args.push(fn_result);
@@ -30,7 +30,7 @@ fn execute_fn_tree(tree: &SyntaxTree) -> Result<String, Error> {
         args,
     };
 
-    println!("{:?}", function);
+    // println!("{:?}", function);
 
     function.call()
 }

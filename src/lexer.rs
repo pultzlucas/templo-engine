@@ -4,7 +4,6 @@ use regex::Regex;
 pub fn lex(input: String) -> Vec<Token> {
     // REGEXES
     let alphanum_reg = Regex::new(r"\w+").unwrap();
-    let input_reg = Regex::new(r"\$\w+").unwrap();
 
     let input = format!("{}\0", input);
     let chars = input.chars().into_iter();
@@ -34,7 +33,7 @@ pub fn lex(input: String) -> Vec<Token> {
         }
 
         // INPUT
-        if input_reg.is_match(&buffer) && !alphanum_reg.is_match(&ch.to_string()) {
+        if alphanum_reg.is_match(&buffer) && !alphanum_reg.is_match(&ch.to_string()) {
             tokens.push(Token::new(buffer.clone(), TokenType::Input));
             buffer = String::new();
         }
