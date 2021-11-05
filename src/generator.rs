@@ -5,12 +5,14 @@ use crate::{
 use std::io::Error;
 
 pub fn generate(tree: SyntaxTree) -> Result<String, Error> {
-    execute_fn_tree(&tree)
+    if tree.tree_type == TreeType::Input {
+        Ok(tree.node)
+    } else {
+        execute_fn_tree(&tree)
+    }
 }
 
 fn execute_fn_tree(tree: &SyntaxTree) -> Result<String, Error> {
-    // println!("{}", tree.node);
-
     let mut args: Vec<String> = vec![];
 
     for child in tree.childs.iter() {

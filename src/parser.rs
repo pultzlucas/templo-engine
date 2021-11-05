@@ -2,7 +2,11 @@ use std::vec;
 
 use regex::Regex;
 
-use crate::{Input, syntax_tree::{SyntaxTree, TreeType}, token::{Token, TokenType}};
+use crate::{
+    syntax_tree::{SyntaxTree, TreeType},
+    token::{Token, TokenType},
+    Input,
+};
 
 #[derive(Debug)]
 struct Arg {
@@ -11,6 +15,26 @@ struct Arg {
 }
 
 pub fn parse(tokens: Vec<Token>, inputs: Vec<Input>) -> SyntaxTree {
+    if tokens[0].type_ == TokenType::Input {
+        parse_input_exp(&tokens[0], inputs)
+    } else {
+        parse_fn_exp(tokens, inputs)
+    }
+}
+
+pub fn parse_input_exp(token: &Token, inputs: Vec<Input>) -> SyntaxTree {
+    let input_value = inputs.iter().find(|input| input.key == token.value);
+    if input_value.is_none() && inputs.len() > 0 {
+        panic!("{}", format!("Input '{}' is not informed.", token.value));
+    }
+    SyntaxTree {
+        childs: vec![],
+        node: input_value.unwrap().value.clone(),
+        tree_type: TreeType::Input
+    }
+}
+
+pub fn parse_fn_exp(tokens: Vec<Token>, inputs: Vec<Input>) -> SyntaxTree {
     let tokens = tokens[..tokens.len() - 1].to_vec();
     let mut tokens_iter = tokens.iter();
     let mut tree = SyntaxTree::new(
@@ -43,7 +67,8 @@ pub fn parse(tokens: Vec<Token>, inputs: Vec<Input>) -> SyntaxTree {
                 panic!("{}", format!("Input '{}' is not informed.", token.value));
             }
 
-            let input = SyntaxTree::new(input_value.unwrap().value.clone(), TreeType::Input, vec![]);
+            let input =
+                SyntaxTree::new(input_value.unwrap().value.clone(), TreeType::Input, vec![]);
             tree.append_child(input);
             layer_args[layer].args += 1;
         }
