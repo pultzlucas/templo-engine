@@ -1,5 +1,4 @@
-mod expression;
-mod expressions;
+mod function_call;
 mod functions;
 mod lexer;
 mod parser;
@@ -8,9 +7,23 @@ mod token;
 mod utils;
 mod generator;
 
-pub fn compile(input: String) -> Result<String, std::io::Error> {
-    let _tokens = lexer::lex(input);
-    let _syntax_tree = parser::parse(_tokens);
+#[derive(Debug, Clone)]
+pub struct Input {
+    key: String,
+    value: String,
+    value_type: InputValueType
+}
+
+
+#[derive(Debug, Clone)]
+pub enum InputValueType {
+    String,
+    Integer
+}
+
+pub fn compile(buffer: String, inputs: Vec<Input>) -> Result<String, std::io::Error> {
+    let _tokens = lexer::lex(buffer);
+    let _syntax_tree = parser::parse(_tokens, inputs);
     let _res = generator::generate(_syntax_tree)?;
     Ok("".to_string())
 }
@@ -18,17 +31,19 @@ pub fn compile(input: String) -> Result<String, std::io::Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    // UPPER_FIRST($oi1, $oi2, FN2($oi3, $oi4))
-    // LOWER(FN($var2, $var3), $eae, JOIN($var4)))
-    // UPPER(LOWER(FN($a)))
-    // (join $var1 $var2)
-    const INPUT: &'static str = r#"str(upper_first('templo'), upper_first('engine'), ' owyeah!')"#;
-
+    const EXP: &'static str = r#"str(upper_first(name), ' ', upper_first('engine'), ' owyeah!')"#;
     #[test]
     fn lib() {
-        let tokens = lexer::lex(INPUT.to_string());
+        let inputs = vec![
+            Input {
+                key: "name".to_string(),
+                value: "templo".to_string(),
+                value_type: InputValueType::String
+            }
+        ];
+        let tokens = lexer::lex(EXP.to_string());
         // tokens.iter().for_each(|token| println!("{:?}", token));
-        let tree = parser::parse(tokens);
+        let tree = parser::parse(tokens, inputs);
         // let _json = serde_json::to_string_pretty(&tree).unwrap();
         // println!("{}", _json);
         let _res = generator::generate(tree).unwrap();

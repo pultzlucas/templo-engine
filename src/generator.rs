@@ -1,5 +1,5 @@
 use crate::{
-    expressions::function_call::FunctionCall,
+    function_call::FunctionCall,
     syntax_tree::{SyntaxTree, TreeType},
 };
 use std::io::Error;

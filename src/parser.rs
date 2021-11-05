@@ -2,10 +2,7 @@ use std::vec;
 
 use regex::Regex;
 
-use crate::{
-    syntax_tree::{SyntaxTree, TreeType},
-    token::{Token, TokenType},
-};
+use crate::{Input, syntax_tree::{SyntaxTree, TreeType}, token::{Token, TokenType}};
 
 #[derive(Debug)]
 struct Arg {
@@ -13,7 +10,7 @@ struct Arg {
     args: usize,
 }
 
-pub fn parse(tokens: Vec<Token>) -> SyntaxTree {
+pub fn parse(tokens: Vec<Token>, inputs: Vec<Input>) -> SyntaxTree {
     let tokens = tokens[..tokens.len() - 1].to_vec();
     let mut tokens_iter = tokens.iter();
     let mut tree = SyntaxTree::new(
@@ -40,7 +37,13 @@ pub fn parse(tokens: Vec<Token>) -> SyntaxTree {
         }
 
         if token.type_ == TokenType::Input {
-            let input = SyntaxTree::new(token.value.clone(), TreeType::Input, vec![]);
+            let input_value = inputs.iter().find(|input| input.key == token.value);
+
+            if input_value.is_none() && inputs.len() > 0 {
+                panic!("{}", format!("Input '{}' is not informed.", input_value.unwrap().key));
+            }
+
+            let input = SyntaxTree::new(input_value.unwrap().value.clone(), TreeType::Input, vec![]);
             tree.append_child(input);
             layer_args[layer].args += 1;
         }

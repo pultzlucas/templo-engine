@@ -27,10 +27,6 @@ impl SyntaxTree {
         self
     }
 
-    pub fn has_childs(&self) -> bool {
-        self.childs.len() > 0
-    }
-
     pub fn get_childs(&mut self, range: RangeFrom<usize>) -> Vec<SyntaxTree> {
         self.childs.splice(range, []).collect()
     }
