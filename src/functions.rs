@@ -21,6 +21,10 @@ pub trait TwoParamFunction {
     }
 }
 
+pub trait InfiniteParamFunction {
+    fn call(args: &Vec<String>) -> String;
+}
+
 pub struct Upper;
 impl OneParamFunction for Upper {
     fn call(args: &Vec<String>) -> String {
@@ -59,5 +63,12 @@ impl TwoParamFunction for Join {
         let sep = if args[1].is_empty() { " " } else { &args[1] };
         let array = split_by(&args[0], sep);
         array.join("")
+    }
+}
+
+pub struct Str;
+impl InfiniteParamFunction for Str {
+    fn call(args: &Vec<String>) -> String {
+        args.join("")
     }
 }

@@ -1,4 +1,4 @@
-use crate::functions::{Join, Lower, OneParamFunction, TwoParamFunction, Upper, UpperFirst};
+use crate::functions::{InfiniteParamFunction, Join, Lower, OneParamFunction, Str, TwoParamFunction, Upper, UpperFirst};
 use crate::token::{Token, TokenType};
 use crate::utils::errors::invalid_input_error;
 use std::io::Error;
@@ -31,6 +31,9 @@ impl FunctionCall {
             "join" => {
                 Join::validate_args(&self.args)?;
                 Join::call(&self.args)
+            },
+            "str" => {
+                Str::call(&self.args)
             }
             _ => return Err(invalid_input_error("Wrong engine function.")),
         })

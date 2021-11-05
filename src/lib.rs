@@ -22,12 +22,12 @@ mod tests {
     // LOWER(FN($var2, $var3), $eae, JOIN($var4)))
     // UPPER(LOWER(FN($a)))
     // (join $var1 $var2)
-    const INPUT: &'static str = r#"UPPER(JOIN('templo-engine', '-'))"#;
+    const INPUT: &'static str = r#"str(upper_first('templo'), upper_first('engine'), ' owyeah!')"#;
 
     #[test]
     fn lib() {
         let tokens = lexer::lex(INPUT.to_string());
-        tokens.iter().for_each(|token| println!("{:?}", token));
+        // tokens.iter().for_each(|token| println!("{:?}", token));
         let tree = parser::parse(tokens);
         // let _json = serde_json::to_string_pretty(&tree).unwrap();
         // println!("{}", _json);
