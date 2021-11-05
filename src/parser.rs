@@ -14,7 +14,7 @@ struct Arg {
     args: usize,
 }
 
-pub fn parse(tokens: Vec<Token>, inputs: Vec<Input>) -> SyntaxTree {
+pub fn parse(tokens: Vec<Token>, inputs: &Vec<Input>) -> SyntaxTree {
     if tokens[0].type_ == TokenType::Input {
         parse_input_exp(&tokens[0], inputs)
     } else {
@@ -22,7 +22,7 @@ pub fn parse(tokens: Vec<Token>, inputs: Vec<Input>) -> SyntaxTree {
     }
 }
 
-pub fn parse_input_exp(token: &Token, inputs: Vec<Input>) -> SyntaxTree {
+pub fn parse_input_exp(token: &Token, inputs: &Vec<Input>) -> SyntaxTree {
     let input_value = inputs.iter().find(|input| input.key == token.value);
     if input_value.is_none() && inputs.len() > 0 {
         panic!("{}", format!("Input '{}' is not informed.", token.value));
@@ -34,7 +34,7 @@ pub fn parse_input_exp(token: &Token, inputs: Vec<Input>) -> SyntaxTree {
     }
 }
 
-pub fn parse_fn_exp(tokens: Vec<Token>, inputs: Vec<Input>) -> SyntaxTree {
+pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<Input>) -> SyntaxTree {
     let tokens = tokens[..tokens.len() - 1].to_vec();
     let mut tokens_iter = tokens.iter();
     let mut tree = SyntaxTree::new(

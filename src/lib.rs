@@ -1,4 +1,4 @@
-use regex::Regex;
+use regex::{Captures, Regex};
 
 mod function_call;
 mod functions;
@@ -22,25 +22,31 @@ pub enum InputValueType {
     Integer,
 }
 
-pub fn compile(buffer: String, inputs: Vec<Input>) -> Result<String, std::io::Error> {
-    // get expressions from text
+pub fn compile(text: String, inputs: &Vec<Input>) -> Result<String, std::io::Error> {
+    let exp_reg = Regex::new(r"\{>.*?<}").unwrap();
+    let final_text = exp_reg
+        .replace_all(&text, |caps: &Captures| {
+            let rmv_brackets_reg = Regex::new(r"[{}><\s]").unwrap();
+            let exp = rmv_brackets_reg.replace_all(&caps[0], "");
 
-    // parse and execute expressions
-    let tokens = lexer::lex(buffer);
-    let syntax_tree = parser::parse(tokens, inputs);
-    let res = generator::generate(syntax_tree)?;
+            let tokens = lexer::lex(exp.to_string());
+            let syntax_tree = parser::parse(tokens, inputs);
+            let res = generator::generate(syntax_tree).unwrap();
 
-    // insert expressions results on text
+            res
+        })
+        .to_string();
 
-    // return final text
-    Ok("".to_string())
+    Ok(final_text)
 }
 
 #[cfg(test)]
 mod tests {
+    use regex::Captures;
+
     use super::*;
-    const EXP_FN: &'static str =
-        r#"str(upper_first(name), ' ', upper_first('engine'), ' ', upper_first('owyeah!'))"#;
+    // const EXP_FN: &'static str =
+    //     r#"str(upper_first(name), ' ', upper_first('engine'), ' ', upper_first('owyeah!'))"#;
     const EXP_INPUT: &'static str = r#"name"#;
     #[test]
     fn parser() {
@@ -50,8 +56,8 @@ mod tests {
             value_type: InputValueType::String,
         }];
         let tokens = lexer::lex(EXP_INPUT.to_string());
-        tokens.iter().for_each(|token| println!("{:?}", token));
-        let tree = parser::parse(tokens, inputs);
+        // tokens.iter().for_each(|token| println!("{:?}", token));
+        let tree = parser::parse(tokens, &inputs);
         // let _json = serde_json::to_string_pretty(&tree).unwrap();
         // println!("{}", _json);
         let _res = generator::generate(tree).unwrap();
@@ -60,24 +66,28 @@ mod tests {
 
     #[test]
     fn miner() {
-       
         let text = std::fs::read_to_string("./test-file.py").unwrap();
-        let exp_reg = Regex::new(r"\{>[\w|\s|-]*<}").unwrap();
-        exp_reg.captures_iter(&text).for_each(|caps| {
-            let rmv_brackets_reg = Regex::new(r"[{}><\s]").unwrap();
-            let exp = rmv_brackets_reg.replace_all(&caps[0], "");
+        let exp_reg = Regex::new(r"\{>.*?<}").unwrap();
 
-            let inputs = vec![Input {
-                key: "class_name".to_string(),
-                value: "dog".to_string(),
-                value_type: InputValueType::String,
-            }];
+        let final_text = exp_reg
+            .replace_all(&text, |caps: &Captures| {
+                let rmv_brackets_reg = Regex::new(r"[{}><\s]").unwrap();
+                let exp = rmv_brackets_reg.replace_all(&caps[0], "");
 
-            let tokens = lexer::lex(exp.to_string());
-            let syntax_tree = parser::parse(tokens, inputs);
-            let res = generator::generate(syntax_tree).unwrap();
+                let inputs = vec![Input {
+                    key: "class_name".to_string(),
+                    value: "cat".to_string(),
+                    value_type: InputValueType::String,
+                }];
 
-            println!("{}", res);
-        })
+                let tokens = lexer::lex(exp.to_string());
+                let syntax_tree = parser::parse(tokens, &inputs);
+                let res = generator::generate(syntax_tree).unwrap();
+
+                res
+            })
+            .to_string();
+
+        println!("{}", final_text);
     }
 }
