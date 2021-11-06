@@ -7,7 +7,7 @@ homepage = "https://github.com/pultzlucas/templo-engine"
 repository = "https://github.com/pultzlucas/templo-engine"
 license = "MIT"
 categories = ["Template engine", "Text processing"]
-keywords = ["template", "template engine", "templo", "engine"]
+keywords = ["template", "template_engine", "templo", "engine"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
