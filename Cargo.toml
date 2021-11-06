@@ -6,7 +6,7 @@ description = "Template engine of Templo tool for insert variables inside of tex
 homepage = "https://github.com/pultzlucas/templo-engine"
 repository = "https://github.com/pultzlucas/templo-engine"
 license = "MIT"
-categories = ["Template engine", "Text processing"]
+categories = ["template-engine", "text-processing"]
 keywords = ["template", "template_engine", "templo", "engine"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
