@@ -5,16 +5,16 @@ use regex::Regex;
 use crate::{
     syntax_tree::{SyntaxTree, TreeType},
     token::{Token, TokenType},
-    Input,
+    EngineArg,
 };
 
 #[derive(Debug)]
-struct Arg {
+struct FnArg {
     layer: usize,
     args: usize,
 }
 
-pub fn parse(tokens: Vec<Token>, inputs: &Vec<Input>) -> SyntaxTree {
+pub fn parse(tokens: Vec<Token>, inputs: &Vec<EngineArg>) -> SyntaxTree {
     if tokens[0].type_ == TokenType::Input {
         parse_input_exp(&tokens[0], inputs)
     } else {
@@ -22,7 +22,7 @@ pub fn parse(tokens: Vec<Token>, inputs: &Vec<Input>) -> SyntaxTree {
     }
 }
 
-pub fn parse_input_exp(token: &Token, inputs: &Vec<Input>) -> SyntaxTree {
+pub fn parse_input_exp(token: &Token, inputs: &Vec<EngineArg>) -> SyntaxTree {
     let input_value = inputs.iter().find(|input| input.key == token.value);
     if input_value.is_none() && inputs.len() > 0 {
         panic!("{}", format!("Input '{}' is not informed.", token.value));
@@ -34,7 +34,7 @@ pub fn parse_input_exp(token: &Token, inputs: &Vec<Input>) -> SyntaxTree {
     }
 }
 
-pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<Input>) -> SyntaxTree {
+pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<EngineArg>) -> SyntaxTree {
     let tokens = tokens[..tokens.len() - 1].to_vec();
     let mut tokens_iter = tokens.iter();
     let mut tree = SyntaxTree::new(
@@ -44,7 +44,7 @@ pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<Input>) -> SyntaxTree {
     );
 
     let mut layer = 0;
-    let mut layer_args: Vec<Arg> = vec![Arg { layer: 0, args: 0 }];
+    let mut layer_args: Vec<FnArg> = vec![FnArg { layer: 0, args: 0 }];
 
     for token in tokens_iter.rev() {
         if token.type_ == TokenType::Function {
@@ -89,9 +89,9 @@ pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<Input>) -> SyntaxTree {
             layer += 1;
 
             if layer_args.get(layer).is_none() {
-                layer_args.push(Arg { args: 0, layer })
+                layer_args.push(FnArg { args: 0, layer })
             } else {
-                layer_args[layer] = Arg { args: 0, layer }
+                layer_args[layer] = FnArg { args: 0, layer }
             }
         }
     }
