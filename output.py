@@ -1,7 +1,7 @@
-class Cat:
+class Dog:
     def __init__(self):
-        self.name = 'cat'
+        self.name = 'dog'
 
-obj = Cat()
+obj = Dog()
 
 print(f'The class name is {obj.name}')

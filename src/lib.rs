@@ -1,3 +1,7 @@
+//! # Templo Engine
+//! 
+//! Template engine of Templo tool for insert and modify variables inside of text files.
+
 use regex::{Captures, Regex};
 
 mod function_call;
@@ -9,20 +13,57 @@ mod syntax_tree;
 mod token;
 mod utils;
 
-#[derive(Debug, Clone)]
-pub struct Input {
-    key: String,
-    value: String,
-    value_type: InputValueType,
-}
-
-#[derive(Debug, Clone)]
-pub enum InputValueType {
-    String,
-    Integer,
-}
-
-pub fn compile(text: String, inputs: &Vec<Input>) -> Result<String, std::io::Error> {
+/// Inserts variables into input text and returns it as result.
+///
+/// # example
+/// 
+/// The input text can have some placeholders represented by "{> arg <}". These placeholders will be used to insert 
+/// the variables passed to compile function. The engine provides some native functions
+/// to manipulate the variable value. 
+/// 
+/// input.py
+/// ```py
+/// class {> upper_first(class_name) <}:
+///     def __init__(self):
+///     self.name = '{> class_name <}'
+///
+/// obj = {> upper_first(class_name) <}()
+///
+/// print(f'The class name is {obj.name}')
+/// 
+/// ```
+/// 
+/// ## execution
+/// 
+/// ```
+/// // Getting the input text
+/// let input_text = std::fs::read_to_string("./input.py").unwrap();
+/// 
+/// // The variables
+/// let variables: Vec<templo_engine::Input> = vec![templo_engine::Input {
+///     key: "class_name".to_string(),
+///     value: "dog".to_string(),
+///     value_type: templo_engine::InputValueType::String,
+/// }];
+/// 
+/// // Compiling the text
+/// let text = templo_engine::insert(input_text, &variables);
+/// 
+/// // writing the output file
+/// std::fs::write("./output.py", text.unwrap()).unwrap();
+/// ```
+/// 
+/// output.py
+/// ```py
+/// class Dog:
+///     def __init__(self):
+///     self.name = 'dog'
+/// 
+/// obj = Dog()
+/// 
+/// print(f'The class name is {obj.name}')
+/// ```
+pub fn insert(text: String, inputs: &Vec<Input>) -> Result<String, std::io::Error> {
     let exp_reg = Regex::new(r"\{>.*?<}").unwrap();
     let final_text = exp_reg
         .replace_all(&text, |caps: &Captures| {
@@ -38,6 +79,19 @@ pub fn compile(text: String, inputs: &Vec<Input>) -> Result<String, std::io::Err
         .to_string();
 
     Ok(final_text)
+}
+
+#[derive(Debug, Clone)]
+pub struct Input {
+    pub key: String,
+    pub value: String,
+    pub value_type: InputValueType,
+}
+
+#[derive(Debug, Clone)]
+pub enum InputValueType {
+    String,
+    Integer,
 }
 
 #[cfg(test)]
@@ -66,7 +120,7 @@ mod tests {
 
     #[test]
     fn miner() {
-        let text = std::fs::read_to_string("./test-file.py").unwrap();
+        let text = std::fs::read_to_string("./input.py").unwrap();
         let exp_reg = Regex::new(r"\{>.*?<}").unwrap();
 
         let final_text = exp_reg
