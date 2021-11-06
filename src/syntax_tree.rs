@@ -1,12 +1,11 @@
-use serde_derive::{Deserialize, Serialize};
 use std::ops::RangeFrom;
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TreeType {
     FunctionCall,
     Input,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct SyntaxTree {
     pub node: String,
     pub tree_type: TreeType,

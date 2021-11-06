@@ -2,11 +2,14 @@
 name = "templo_engine"
 version = "0.1.0"
 edition = "2018"
+description = "Template engine of Templo tool for insert variables inside of text files."
+homepage = "https://github.com/pultzlucas/templo-engine"
+repository = "https://github.com/pultzlucas/templo-engine"
+license = "MIT"
+categories = ["Template engine", "Text processing"]
+keywords = ["template", "template engine", "templo", "engine"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 regex = "1.5.4"
-serde_derive = "*"
-serde_json = "*"
-serde = "*"

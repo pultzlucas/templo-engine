@@ -1,6 +1,6 @@
 //! # Templo Engine
 //! 
-//! Template engine of Templo tool for insert and modify variables inside of text files.
+//! Template engine of Templo tool for insert variables inside of text files.
 
 use regex::{Captures, Regex};
 
