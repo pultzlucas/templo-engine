@@ -1,4 +1,4 @@
-# templo-engine
+# Templo Engine
 Template engine of Templo tool for insert and modify variables inside of text files.
 
  # example
