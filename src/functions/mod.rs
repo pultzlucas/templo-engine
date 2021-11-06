@@ -1,6 +1,8 @@
 use std::io::Error;
 use crate::utils::{errors::invalid_input_error, string::split_by};
 
+#[cfg(test)]
+mod tests;
 pub trait OneParamFunction {
     fn call(args: &Vec<String>) -> String;
     fn validate_args(args: &Vec<String>) -> Result<(), Error> {
