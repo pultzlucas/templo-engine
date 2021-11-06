@@ -1,6 +1,6 @@
 [package]
 name = "templo_engine"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2018"
 description = "Template engine of Templo tool for insert variables inside of text files."
 homepage = "https://github.com/pultzlucas/templo-engine"
