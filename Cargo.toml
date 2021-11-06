@@ -1,13 +1,14 @@
 [package]
 name = "templo_engine"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2018"
-description = "Template engine of Templo tool for insert variables inside of text files."
+description = "This crate is the template engine of Templo tool for insert arguments inside of text files."
 homepage = "https://github.com/pultzlucas/templo-engine"
 repository = "https://github.com/pultzlucas/templo-engine"
 license = "MIT"
 categories = ["template-engine", "text-processing"]
 keywords = ["template", "template_engine", "templo", "engine"]
+authors = ["pultzlucas"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
