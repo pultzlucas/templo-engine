@@ -2,7 +2,7 @@
 //!
 //! Template engine of Templo tool for insert variables inside of text files.
 
-use std::fmt::Error;
+use std::io::Error;
 
 use regex::{Captures, Regex};
 
