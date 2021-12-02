@@ -2,3 +2,4 @@
 Cargo.lock
 input.py
 output.py
+*.txt

@@ -1,4 +1,4 @@
-use crate::functions::{InfiniteParamFunction, Join, Lower, OneParamFunction, Str, TwoParamFunction, Upper, UpperFirst};
+use crate::functions::{InfiniteParamFunction, Join, Lower, OneParamFunction, Str, TwoParamFunction, Upper, UpperFirst, GetChar};
 use crate::utils::errors::invalid_input_error;
 use std::io::Error;
 
@@ -26,6 +26,10 @@ impl FunctionCall {
             "join" => {
                 Join::validate_args(&self.args)?;
                 Join::call(&self.args)
+            },
+            "get_char" => {
+                GetChar::validate_args(&self.args)?;
+                GetChar::call(&self.args)
             },
             "str" => {
                 Str::call(&self.args)

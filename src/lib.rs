@@ -19,7 +19,7 @@ mod utils;
 ///
 /// # example
 ///
-/// The input text can have some placeholders represented by "{> arg <}". These placeholders will be 
+/// The input text can have some placeholders represented by "{> arg <}". These placeholders will be
 /// used to insert the arguments passed to the engine. The engine provides some native functions
 /// to manipulate the argument value.
 ///
@@ -108,4 +108,23 @@ pub struct EngineArg {
 pub enum EngineArgType {
     String,
     Integer,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const TEXT: &str = "{> get_char(word, 3) <}";
+
+    #[test]
+    fn engine_test() {
+        let args = vec![EngineArg {
+            key: "word".to_string(),
+            value: "Hello!".to_string(),
+            value_type: EngineArgType::String,
+        }];
+        let engine = Engine::new(args);
+        let out = engine.compile(TEXT.to_string()).unwrap();
+        assert_eq!(out, "l")
+    }
 }

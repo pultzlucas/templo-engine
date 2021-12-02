@@ -1,5 +1,5 @@
-use std::io::Error;
 use crate::utils::{errors::invalid_input_error, string::split_by};
+use std::io::Error;
 
 #[cfg(test)]
 mod tests;
@@ -65,6 +65,14 @@ impl TwoParamFunction for Join {
         let sep = if args[1].is_empty() { " " } else { &args[1] };
         let array = split_by(&args[0], sep);
         array.join("")
+    }
+}
+
+pub struct GetChar;
+impl TwoParamFunction for GetChar {
+    fn call(args: &Vec<String>) -> String {
+        let idx = args[1].parse::<usize>().expect("Index must be a integer");
+        args[0].chars().nth(idx).expect("Index exceded").to_string()
     }
 }
 

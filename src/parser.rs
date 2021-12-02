@@ -30,7 +30,7 @@ pub fn parse_input_exp(token: &Token, inputs: &Vec<EngineArg>) -> SyntaxTree {
     SyntaxTree {
         childs: vec![],
         node: input_value.unwrap().value.clone(),
-        tree_type: TreeType::Input
+        tree_type: TreeType::Input,
     }
 }
 
@@ -69,6 +69,13 @@ pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<EngineArg>) -> SyntaxTree {
 
             let input =
                 SyntaxTree::new(input_value.unwrap().value.clone(), TreeType::Input, vec![]);
+            tree.append_child(input);
+            layer_args[layer].args += 1;
+        }
+
+        if token.type_ == TokenType::Integer {
+            let input =
+                SyntaxTree::new(token.value.clone(), TreeType::Input, vec![]);
             tree.append_child(input);
             layer_args[layer].args += 1;
         }

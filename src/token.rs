@@ -17,7 +17,6 @@ pub enum TokenType {
     BracketRight,
     Separator,
     Input,
-    String
-    // Quotes,
-    // Eof
+    String,
+    Integer
 }
