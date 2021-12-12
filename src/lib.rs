@@ -86,7 +86,7 @@ impl Engine {
 
                 let tokens = lexer::lex(exp.to_string());
                 let syntax_tree = parser::parse(tokens, &self.args);
-                println!("{:?}", syntax_tree);
+                // println!("{:?}", syntax_tree);
                 let res = generator::generate(syntax_tree).unwrap();
 
                 res.node
@@ -115,7 +115,7 @@ pub enum EngineArgType {
 mod tests {
     use super::*;
 
-    const TEXT: &str = "{> get_index(word, 'H') <}";
+    const TEXT: &str = "{> get_index(word, get_char(0, word)) <}";
 
     #[test]
     fn engine_test() {

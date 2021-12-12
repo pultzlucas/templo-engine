@@ -1,4 +1,4 @@
-use crate::functions::{EngineFunction, GetChar, GetIndex, Upper};
+use crate::functions::{EngineFunction, GetChar, GetIndex, Upper, Lower, UpperFirst, Join};
 use crate::syntax_tree::{SyntaxTree, TreeType, TreeValueType};
 use crate::utils::errors::invalid_input_error;
 use std::io::Error;
@@ -28,21 +28,11 @@ impl FunctionCall {
 
         let res = match self.function.to_lowercase().as_str() {
             "upper" => exec_fn(&Upper),
-            // "lower" => {
-            //     Lower::validate_args(&self.args)?;
-            //     Lower::call(&self.args)
-            // }
-            // "upper_first" => {
-            //     UpperFirst::validate_args(&self.args)?;
-            //     UpperFirst::call(&self.args)
-            // }
-            // "join" => {
-            //     Join::validate_args(&self.args)?;
-            //     Join::call(&self.args)
-            // }
-            // "get_char" => exec_fn(&GetChar),
+            "lower" => exec_fn(&Lower),
+            "upper_first" => exec_fn(&UpperFirst),
+            "join" => exec_fn(&Join),
+            "get_char" => exec_fn(&GetChar),
             "get_index" => exec_fn(&GetIndex),
-            // "str" => Str::call(&self.args),
             _ => return Err(invalid_input_error("Wrong engine function.")),
         };
 
@@ -73,25 +63,14 @@ fn create_output_obj(node: String, tree_val_type: TreeValueType) -> SyntaxTree {
     }
 }
 
-// #[derive(Debug, PartialEq)]
-// enum EngineFunction {
-//     Upper(Upper),
-//     Lower(Lower),
-//     UpperFirst(UpperFirst),
-//     Join(Join),
-//     GetChar(GetChar),
-//     Str(Str),
-// }
-
 pub fn get_fn_obj(fn_name: &str) -> Box<dyn EngineFunction> {
     match fn_name.to_lowercase().as_str() {
         "upper" => Box::new(Upper),
-        // "lower" => Lower,
-        // "upper_first" => UpperFirst,
-        // "join" => Join,
+        "lower" => Box::new(Lower),
+        "upper_first" => Box::new(UpperFirst),
+        "join" => Box::new(Join),
         "get_char" => Box::new(GetChar),
         "get_index" => Box::new(GetIndex),
-        // "str" => Str,
         _ => panic!("Wrong engine function."),
     }
 }

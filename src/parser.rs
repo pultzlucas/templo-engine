@@ -36,7 +36,6 @@ pub fn parse_input_exp(token: &Token, inputs: &Vec<EngineArg>) -> SyntaxTree {
     }
 }
 
-#[warn(unreachable_patterns)]
 pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<EngineArg>) -> SyntaxTree {
     let tokens = tokens[..tokens.len() - 1].to_vec();
     let mut tokens_iter = tokens.iter();
@@ -82,7 +81,6 @@ pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<EngineArg>) -> SyntaxTree {
             let input_type = match input_value.value_type {
                 EngineArgType::String => TreeValueType::String,
                 EngineArgType::Integer => TreeValueType::Integer,
-                _ => TreeValueType::Nil,
             };
 
             let input = SyntaxTree::new(
