@@ -86,9 +86,10 @@ impl Engine {
 
                 let tokens = lexer::lex(exp.to_string());
                 let syntax_tree = parser::parse(tokens, &self.args);
+                println!("{:?}", syntax_tree);
                 let res = generator::generate(syntax_tree).unwrap();
 
-                res
+                res.node
             })
             .to_string();
 
@@ -114,17 +115,17 @@ pub enum EngineArgType {
 mod tests {
     use super::*;
 
-    const TEXT: &str = "{> get_char(word, 3) <}";
+    const TEXT: &str = "{> get_index(word, 'H') <}";
 
     #[test]
     fn engine_test() {
         let args = vec![EngineArg {
             key: "word".to_string(),
-            value: "Hello!".to_string(),
+            value: "Hello".to_string(),
             value_type: EngineArgType::String,
         }];
         let engine = Engine::new(args);
         let out = engine.compile(TEXT.to_string()).unwrap();
-        assert_eq!(out, "l")
+        assert_eq!(out, "0")
     }
 }

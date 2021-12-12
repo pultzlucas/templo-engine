@@ -3,9 +3,10 @@ use std::vec;
 use regex::Regex;
 
 use crate::{
-    syntax_tree::{SyntaxTree, TreeType},
+    function_call::get_fn_obj,
+    syntax_tree::{SyntaxTree, TreeType, TreeValueType},
     token::{Token, TokenType},
-    EngineArg,
+    EngineArg, EngineArgType,
 };
 
 #[derive(Debug)]
@@ -31,9 +32,11 @@ pub fn parse_input_exp(token: &Token, inputs: &Vec<EngineArg>) -> SyntaxTree {
         childs: vec![],
         node: input_value.unwrap().value.clone(),
         tree_type: TreeType::Input,
+        tree_val_type: TreeValueType::String,
     }
 }
 
+#[warn(unreachable_patterns)]
 pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<EngineArg>) -> SyntaxTree {
     let tokens = tokens[..tokens.len() - 1].to_vec();
     let mut tokens_iter = tokens.iter();
@@ -41,6 +44,7 @@ pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<EngineArg>) -> SyntaxTree {
         tokens_iter.next().unwrap().value.clone(),
         TreeType::FunctionCall,
         vec![],
+        TreeValueType::String,
     );
 
     let mut layer = 0;
@@ -53,29 +57,51 @@ pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<EngineArg>) -> SyntaxTree {
             let mut args: Vec<SyntaxTree> = tree.get_childs(range);
             args.reverse();
 
-            let fun = SyntaxTree::new(token.value.clone(), TreeType::FunctionCall, args);
-            tree.append_child(fun);
+            let fn_obj = get_fn_obj(&token.value);
+            let fun = SyntaxTree::new(
+                token.value.clone(),
+                TreeType::FunctionCall,
+                args,
+                fn_obj.return_type(),
+            );
 
+            tree.append_child(fun);
             layer -= 1;
             layer_args[layer].args += 1;
         }
 
         if token.type_ == TokenType::Input {
-            let input_value = inputs.iter().find(|input| input.key == token.value);
+            let input_value = inputs.into_iter().find(|input| input.key == token.value);
 
             if input_value.is_none() && inputs.len() > 0 {
                 panic!("{}", format!("Input '{}' is not informed.", token.value));
             }
 
-            let input =
-                SyntaxTree::new(input_value.unwrap().value.clone(), TreeType::Input, vec![]);
+            let input_value = input_value.unwrap();
+
+            let input_type = match input_value.value_type {
+                EngineArgType::String => TreeValueType::String,
+                EngineArgType::Integer => TreeValueType::Integer,
+                _ => TreeValueType::Nil,
+            };
+
+            let input = SyntaxTree::new(
+                input_value.value.clone(),
+                TreeType::Input,
+                vec![],
+                input_type,
+            );
             tree.append_child(input);
             layer_args[layer].args += 1;
         }
 
         if token.type_ == TokenType::Integer {
-            let input =
-                SyntaxTree::new(token.value.clone(), TreeType::Input, vec![]);
+            let input = SyntaxTree::new(
+                token.value.clone(),
+                TreeType::Input,
+                vec![],
+                TreeValueType::Integer,
+            );
             tree.append_child(input);
             layer_args[layer].args += 1;
         }
@@ -85,8 +111,12 @@ pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<EngineArg>) -> SyntaxTree {
             let middle_quotes_reg = Regex::new(r"\\'").unwrap();
             let real_string_value = middle_quotes_reg.replace_all(value, "'");
 
-            let input = SyntaxTree::new(real_string_value.to_string(), TreeType::Input, vec![]);
-            // println!("{:?}", input);
+            let input = SyntaxTree::new(
+                real_string_value.to_string(),
+                TreeType::Input,
+                vec![],
+                TreeValueType::String,
+            );
 
             tree.append_child(input);
             layer_args[layer].args += 1;

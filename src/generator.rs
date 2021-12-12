@@ -4,16 +4,16 @@ use crate::{
 };
 use std::io::Error;
 
-pub fn generate(tree: SyntaxTree) -> Result<String, Error> {
+pub fn generate(tree: SyntaxTree) -> Result<SyntaxTree, Error> {
     if tree.tree_type == TreeType::Input {
-        Ok(tree.node)
+        Ok(tree)
     } else {
         execute_fn_tree(&tree)
     }
 }
 
-fn execute_fn_tree(tree: &SyntaxTree) -> Result<String, Error> {
-    let mut args: Vec<String> = vec![];
+fn execute_fn_tree(tree: &SyntaxTree) -> Result<SyntaxTree, Error> {
+    let mut args: Vec<SyntaxTree> = vec![];
 
     for child in tree.childs.iter() {
         // println!("child -> {:?}", child);
@@ -23,7 +23,7 @@ fn execute_fn_tree(tree: &SyntaxTree) -> Result<String, Error> {
         }
 
         if child.tree_type == TreeType::Input {
-            args.push(child.node.clone())
+            args.push(child.clone())
         }
     }
 

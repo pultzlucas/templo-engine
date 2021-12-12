@@ -1,10 +1,23 @@
-use crate::utils::{errors::invalid_input_error, string::split_by};
-use std::io::Error;
+use crate::{
+    syntax_tree::TreeValueType,
+    utils::{errors::invalid_input_error, string::split_by},
+};
+use std::{fmt::Debug, io::Error};
 
 #[cfg(test)]
 mod tests;
+
+pub trait EngineFunction: Debug {
+    fn call(&self, args: &Vec<String>) -> String;
+    // fn validate_args(&self, args: &Vec<String>) -> Result<(), Error>;
+    fn return_type(&self) -> TreeValueType {
+        TreeValueType::Nil
+    }
+
+    fn params_type(&self) -> Option<Vec<TreeValueType>>;
+}
+
 pub trait OneParamFunction {
-    fn call(args: &Vec<String>) -> String;
     fn validate_args(args: &Vec<String>) -> Result<(), Error> {
         if args.len() == 0 {
             return Err(invalid_input_error("One parameter is required."));
@@ -12,9 +25,7 @@ pub trait OneParamFunction {
         Ok(())
     }
 }
-
 pub trait TwoParamFunction {
-    fn call(args: &Vec<String>) -> String;
     fn validate_args(args: &Vec<String>) -> Result<(), Error> {
         if args.len() < 2 {
             return Err(invalid_input_error("Two parameters is required."));
@@ -23,62 +34,113 @@ pub trait TwoParamFunction {
     }
 }
 
-pub trait InfiniteParamFunction {
-    fn call(args: &Vec<String>) -> String;
-}
-
+#[derive(Debug, PartialEq)]
 pub struct Upper;
-impl OneParamFunction for Upper {
-    fn call(args: &Vec<String>) -> String {
+
+// #[derive(Debug, PartialEq)]
+// pub struct Lower;
+
+// #[derive(Debug, PartialEq)]
+// pub struct UpperFirst;
+
+// #[derive(Debug, PartialEq)]
+// pub struct Join;
+
+#[derive(Debug, PartialEq)]
+pub struct GetChar;
+
+#[derive(Debug, PartialEq)]
+pub struct GetIndex;
+
+impl EngineFunction for Upper {
+    fn call(&self, args: &Vec<String>) -> String {
         args[0].to_uppercase()
     }
-}
 
-pub struct Lower;
-impl OneParamFunction for Lower {
-    fn call(args: &Vec<String>) -> String {
-        args[0].to_lowercase()
+    fn params_type(&self) -> Option<Vec<TreeValueType>> {
+        Some(vec![TreeValueType::String])
+    }
+
+    fn return_type(&self) -> TreeValueType {
+        TreeValueType::String
     }
 }
 
-pub struct UpperFirst;
-impl OneParamFunction for UpperFirst {
-    fn call(args: &Vec<String>) -> String {
-        let first_char: Vec<String> = args[0]
-            .chars()
-            .enumerate()
-            .into_iter()
-            .map(|(i, ch)| {
-                if i == 0 {
-                    return ch.to_uppercase().to_string();
-                }
-                ch.to_string()
-            })
-            .collect();
-        first_char.join("")
-    }
-}
+// impl EngineFunction for Lower {
+//     fn call(args: &Vec<String>) -> String {
+//         args[0].to_lowercase()
+//     }
 
-pub struct Join;
-impl TwoParamFunction for Join {
-    fn call(args: &Vec<String>) -> String {
-        let sep = if args[1].is_empty() { " " } else { &args[1] };
-        let array = split_by(&args[0], sep);
-        array.join("")
-    }
-}
+//     fn return_type() -> TreeValueType {
+//         TreeValueType::String
+//     }
+// }
 
-pub struct GetChar;
-impl TwoParamFunction for GetChar {
-    fn call(args: &Vec<String>) -> String {
+// impl EngineFunction for UpperFirst {
+//     fn call(args: &Vec<String>) -> String {
+//         let first_char: Vec<String> = args[0]
+//             .chars()
+//             .enumerate()
+//             .into_iter()
+//             .map(|(i, ch)| {
+//                 if i == 0 {
+//                     return ch.to_uppercase().to_string();
+//                 }
+//                 ch.to_string()
+//             })
+//             .collect();
+//         first_char.join("")
+//     }
+
+//     fn return_type() -> TreeValueType {
+//         TreeValueType::String
+//     }
+// }
+
+// impl EngineFunction for Join {
+//     fn call(args: &Vec<String>) -> String {
+//         let sep = if args[1].is_empty() { " " } else { &args[1] };
+//         let array = split_by(&args[0], sep);
+//         array.join("")
+//     }
+
+//     fn return_type() -> TreeValueType {
+//         TreeValueType::String
+//     }
+// }
+
+impl EngineFunction for GetChar {
+    fn call(&self, args: &Vec<String>) -> String {
         let idx = args[1].parse::<usize>().expect("Index must be a integer");
         args[0].chars().nth(idx).expect("Index exceded").to_string()
     }
+
+    fn params_type(&self) -> Option<Vec<TreeValueType>> {
+        Some(vec![TreeValueType::String, TreeValueType::Integer])
+    }
+
+    fn return_type(&self) -> TreeValueType {
+        TreeValueType::String
+    }
 }
 
-pub struct Str;
-impl InfiniteParamFunction for Str {
-    fn call(args: &Vec<String>) -> String {
-        args.join("")
+impl EngineFunction for GetIndex {
+    fn call(&self, args: &Vec<String>) -> String {
+        let position = args[0]
+            .chars()
+            .position(|c| c.to_string() == args[1]);
+
+        match position {
+            Some(idx) => idx.to_string(),
+            None => "-1".to_string()
+        }
+    }
+
+    fn params_type(&self) -> Option<Vec<TreeValueType>> {
+        Some(vec![TreeValueType::String, TreeValueType::String])
+    }
+
+    fn return_type(&self) -> TreeValueType {
+        TreeValueType::Integer
     }
 }
