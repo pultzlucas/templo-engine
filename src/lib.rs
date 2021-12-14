@@ -78,22 +78,28 @@ impl Engine {
     }
 
     pub fn compile(&self, text: String) -> Result<String, Error> {
-        let exp_reg = Regex::new(r"\{>.*?<}").unwrap();
-        let final_text = exp_reg
-            .replace_all(&text, |caps: &Captures| {
-                let rmv_brackets_reg = Regex::new(r"[{}><\s]").unwrap();
-                let exp = rmv_brackets_reg.replace_all(&caps[0], "");
+        let exp_catcher = Regex::new(r"\{>.*?<}").unwrap();
+        let final_text = exp_catcher.replace_all(&text, |exp: &Captures| {
+            Engine::process_expression(&self.args, exp)
+        });
+        Ok(final_text.to_string())
+    }
 
-                let tokens = lexer::lex(exp.to_string());
-                let syntax_tree = parser::parse(tokens, &self.args);
-                // println!("{:?}", syntax_tree);
-                let res = generator::generate(syntax_tree).unwrap();
+    fn process_expression(args: &Vec<EngineArg>, exp: &Captures) -> String {
+        // clean expression (remove the side brackets)
+        let rmv_brackets_reg = Regex::new(r"[{}><\s]").unwrap();
+        let exp = rmv_brackets_reg.replace_all(&exp[0], "");
 
-                res.node
-            })
-            .to_string();
+        // tokenize expression
+        let tokens = lexer::lex(exp.to_string());
 
-        Ok(final_text)
+        // build expression syntax tree
+        let syntax_tree = parser::parse(tokens, args);
+
+        // generate output text
+        let res = generator::generate(syntax_tree).unwrap();
+
+        res.node
     }
 }
 
