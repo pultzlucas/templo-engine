@@ -5,7 +5,7 @@ pub enum TreeType {
     Input,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SyntaxTree {
     pub node: String,
     pub tree_type: TreeType,

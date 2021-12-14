@@ -32,17 +32,17 @@ pub struct GetChar;
 #[derive(Debug, PartialEq)]
 pub struct GetIndex;
 
-/// Function to transform all characters of string to uppercase.
-///
-/// Usage:
-/// ````
-/// upper(<string>)
-/// ````
-///
-/// Example:
-/// ````
-/// upper('hi') -> 'HI'
-/// ````
+// Function to transform all characters of string to uppercase.
+//
+// Usage:
+// ````
+// upper(<string>)
+// ````
+//
+// Example:
+// ````
+// upper('hi') -> 'HI'
+// ````
 impl EngineFunction for Upper {
     fn call(&self, args: &Vec<String>) -> String {
         args[0].to_uppercase()
@@ -57,17 +57,17 @@ impl EngineFunction for Upper {
     }
 }
 
-/// Function to transform all characters of string to lowercase.
-///
-/// Usage:
-/// ````
-/// lower(<string>)
-/// ````
-///
-/// Example:
-/// ````
-/// lower('TEMPLO') -> 'templo'
-/// ````
+// Function to transform all characters of string to lowercase.
+//
+// Usage:
+// ````
+// lower(<string>)
+// ````
+//
+// Example:
+// ````
+// lower('TEMPLO') -> 'templo'
+// ````
 impl EngineFunction for Lower {
     fn call(&self, args: &Vec<String>) -> String {
         args[0].to_lowercase()
@@ -82,17 +82,17 @@ impl EngineFunction for Lower {
     }
 }
 
-/// Function to transform the first char of string to uppercase.
-///
-/// Usage:
-/// ````
-/// upper_first(<string>)
-/// ````
-///
-/// Example:
-/// ````
-/// upper_first('engine') -> 'Engine'
-/// ````
+// Function to transform the first char of string to uppercase.
+//
+// Usage:
+// ````
+// upper_first(<string>)
+// ````
+//
+// Example:
+// ````
+// upper_first('engine') -> 'Engine'
+// ````
 impl EngineFunction for UpperFirst {
     fn call(&self, args: &Vec<String>) -> String {
         let first_char: Vec<String> = args[0]
@@ -118,17 +118,17 @@ impl EngineFunction for UpperFirst {
     }
 }
 
-/// Function to delete some part of string and joined the other parts.
-///
-/// Usage:
-/// ````
-/// join(<string>, <string>)
-/// ````
-///
-/// Example:
-/// ````
-/// join('Templo-tool-LGTM', '-') -> 'TemplotoolLGTM'
-/// ````
+// Function to delete some part of string and joined the other parts.
+//
+// Usage:
+// ````
+// join(<string>, <string>)
+// ````
+//
+// Example:
+// ````
+// join('Templo-tool-LGTM', '-') -> 'TemplotoolLGTM'
+// ````
 impl EngineFunction for Join {
     fn call(&self, args: &Vec<String>) -> String {
         let sep = if args[1].is_empty() { " " } else { &args[1] };
@@ -145,17 +145,17 @@ impl EngineFunction for Join {
     }
 }
 
-/// Function to get the character of index informed.
-///
-/// Usage:
-/// ````
-/// get_char(<index>, <string>)
-/// ````
-///
-/// Example:
-/// ````
-/// get_char(1, 'Hello') -> 'e'
-/// ````
+// Function to get the character of index informed.
+//
+// Usage:
+// ````
+// get_char(<index>, <string>)
+// ````
+//
+// Example:
+// ````
+// get_char(1, 'Hello') -> 'e'
+// ````
 impl EngineFunction for GetChar {
     fn call(&self, args: &Vec<String>) -> String {
         let idx = args[0].parse::<usize>().expect("Index must be a integer");
@@ -171,16 +171,16 @@ impl EngineFunction for GetChar {
     }
 }
 
-/// Function to get the index of a specific character of string.
-/// Usage:
-/// ````
-/// get_index(<string>, <char>)
-/// ````
-///
-/// Example:
-/// ````
-/// get_index('Rust', 'R') -> 0
-/// ````
+// Function to get the index of a specific character of string.
+// Usage:
+// ````
+// get_index(<string>, <char>)
+// ````
+//
+// Example:
+// ````
+// get_index('Rust', 'R') -> 0
+// ````
 impl EngineFunction for GetIndex {
     fn call(&self, args: &Vec<String>) -> String {
         let position = args[0].chars().position(|c| c.to_string() == args[1]);

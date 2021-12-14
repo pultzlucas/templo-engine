@@ -1,4 +1,4 @@
-use crate::functions::{EngineFunction, GetChar, GetIndex, Upper, Lower, UpperFirst, Join};
+use crate::functions::{EngineFunction, GetChar, GetIndex, Join, Lower, Upper, UpperFirst};
 use crate::syntax_tree::{SyntaxTree, TreeType, TreeValueType};
 use crate::utils::errors::invalid_input_error;
 use std::io::Error;
@@ -77,63 +77,137 @@ pub fn get_fn_obj(fn_name: &str) -> Box<dyn EngineFunction> {
 
 #[cfg(test)]
 mod test {
-    // use super::*;
+    use super::*;
 
-    // #[test]
-    // fn function_call_test1() {
-    //     let fc = FunctionCall {
-    //         function: "upper".to_string(),
-    //         args: vec!["Templo".to_string()],
-    //     };
-    //     assert_eq!(fc.call().unwrap(), "TEMPLO".to_string());
-    // }
+    #[test]
+    fn function_call_test1() {
+        let args = vec![SyntaxTree {
+            childs: vec![],
+            node: String::from("Templo"),
+            tree_type: TreeType::Input,
+            tree_val_type: TreeValueType::String,
+        }];
 
-    // #[test]
-    // fn function_call_test2() {
-    //     let fc = FunctionCall {
-    //         function: "join".to_string(),
-    //         args: vec!["Templo Moon".to_string(), " ".to_string()],
-    //     };
-    //     assert_eq!(fc.call().unwrap(), "TemploMoon".to_string());
-    // }
+        let fc = FunctionCall {
+            function: "upper".to_string(),
+            args,
+        };
+        assert_eq!(
+            fc.call().unwrap(),
+            SyntaxTree {
+                childs: vec![],
+                node: String::from("TEMPLO"),
+                tree_type: TreeType::Input,
+                tree_val_type: TreeValueType::String
+            }
+        );
+    }
 
-    // #[test]
-    // fn function_call_test3() {
-    //     let fc = FunctionCall {
-    //         function: "lower".to_string(),
-    //         args: vec![],
-    //     };
-    //     assert!(fc.call().is_err());
-    // }
+    #[test]
+    fn function_call_test2() {
+        let args = vec![
+            SyntaxTree {
+                childs: vec![],
+                node: String::from("Templo Moon"),
+                tree_type: TreeType::Input,
+                tree_val_type: TreeValueType::String,
+            },
+            SyntaxTree {
+                childs: vec![],
+                node: String::from(" "),
+                tree_type: TreeType::Input,
+                tree_val_type: TreeValueType::String,
+            },
+        ];
 
-    // #[test]
-    // fn function_call_test4() {
-    //     let fc = FunctionCall {
-    //         function: "lower".to_string(),
-    //         args: vec!["Templo Sun".to_string()],
-    //     };
-    //     assert_eq!(fc.call().unwrap(), "templo sun".to_string());
-    // }
+        let fc = FunctionCall {
+            function: "join".to_string(),
+            args,
+        };
 
-    // #[test]
-    // fn function_call_test5() {
-    //     let lower = FunctionCall {
-    //         function: "lower".to_string(),
-    //         args: vec!["Templo Sun".to_string()],
-    //     };
+        assert_eq!(
+            fc.call().unwrap(),
+            SyntaxTree {
+                childs: vec![],
+                node: String::from("TemploMoon"),
+                tree_type: TreeType::Input,
+                tree_val_type: TreeValueType::String,
+            },
+        );
+    }
 
-    //     let join = FunctionCall {
-    //         function: "join".to_string(),
-    //         args: vec![lower.call().unwrap(), " ".to_string()],
-    //     };
+    #[test]
+    #[should_panic]
+    fn function_call_test3() {
+        let fc = FunctionCall {
+            function: "lower".to_string(),
+            args: vec![],
+        };
+        assert!(fc.call().is_err());
+    }
 
-    //     let upper_first = FunctionCall {
-    //         function: "upper_first".to_string(),
-    //         args: vec![join.call().unwrap()],
-    //     };
+    #[test]
+    fn function_call_test4() {
+        let args = vec![SyntaxTree {
+            childs: vec![],
+            node: String::from("Templo Sun"),
+            tree_type: TreeType::Input,
+            tree_val_type: TreeValueType::String,
+        }];
 
-    //     let final_result = upper_first.call().unwrap();
+        let fc = FunctionCall {
+            function: "lower".to_string(),
+            args,
+        };
+        assert_eq!(
+            fc.call().unwrap(),
+            SyntaxTree {
+                childs: vec![],
+                node: String::from("templo sun"),
+                tree_type: TreeType::Input,
+                tree_val_type: TreeValueType::String,
+            }
+        );
+    }
 
-    //     assert_eq!(final_result, "Templosun".to_string());
-    // }
+    #[test]
+    fn function_call_test5() {
+        let input = "Templo Sun";
+        let lower = FunctionCall {
+            function: "lower".to_string(),
+            args: vec![SyntaxTree {
+                childs: vec![],
+                node: input.to_string(),
+                tree_type: TreeType::Input,
+                tree_val_type: TreeValueType::String,
+            }],
+        };
+
+        let join = FunctionCall {
+            function: "join".to_string(),
+            args: vec![
+                lower.call().unwrap(),
+                SyntaxTree {
+                    childs: vec![],
+                    node: String::from(" "),
+                    tree_type: TreeType::Input,
+                    tree_val_type: TreeValueType::String,
+                },
+            ],
+        };
+
+        let upper_first = FunctionCall {
+            function: "upper_first".to_string(),
+            args: vec![join.call().unwrap()],
+        };
+
+        let final_result = upper_first.call().unwrap();
+
+        assert_eq!(final_result,  SyntaxTree {
+            childs: vec![],
+            node: String::from("Templosun"),
+            tree_type: TreeType::Input,
+            tree_val_type: TreeValueType::String,
+        },);
+    }
 }
