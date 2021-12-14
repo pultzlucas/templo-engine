@@ -21,7 +21,7 @@ mod utils;
 ///
 /// The input text can have some placeholders represented by "{> arg <}". These placeholders will be
 /// used to insert the arguments passed to the engine. The engine provides some native functions
-/// to manipulate the argument value.
+/// to manipulate the argument value as well.
 ///
 /// input.py
 /// ```py
@@ -38,20 +38,22 @@ mod utils;
 /// ## execution
 ///
 /// ```
+/// use templo_engine::*;
+/// 
 /// // Getting the input text
 /// let input_text = std::fs::read_to_string("./input.py").unwrap();
 ///
 /// // The arguments
-/// let arguments: Vec<templo_engine::EngineArg> = vec![
-///     templo_engine::EngineArg {
-///         key: "class_name".to_string(),
-///         value: "dog".to_string(),
-///         value_type: templo_engine::EngineArgType::String,
+/// let arguments = vec![
+///     EngineArg {
+///         key: String::from("class_name"),
+///         value: String::from("dog"),
+///         value_type: EngineArgType::String,
 ///     }
 /// ];
 ///
 /// // Inserting the arguments on text
-/// let engine = templo_engine::Engine::new(arguments);
+/// let engine = Engine::new(arguments);
 /// let text = engine.compile(input_text);
 ///
 /// // writing the output file
