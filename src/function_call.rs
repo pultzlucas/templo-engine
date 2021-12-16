@@ -12,13 +12,6 @@ pub fn call_eng_fn(function_name: String, args: Vec<SyntaxTree>) -> Result<Synta
         fn_args_value.push(arg.node)
     }
 
-    let exec_fn = |function: Box<dyn EngineFunction>| {
-        if let Some(params_type) = function.params_type() {
-            check_fn_args_type(fn_args_type, params_type);
-        }
-        create_output_obj(function.call(&fn_args_value), function.return_type())
-    };
-
     let function_obj = get_fn_obj(&function_name);
 
     if args.len() > function_obj.params_quant() {
@@ -30,8 +23,16 @@ pub fn call_eng_fn(function_name: String, args: Vec<SyntaxTree>) -> Result<Synta
         );
     }
 
-    let res = exec_fn(function_obj);
-    Ok(res)
+    if let Some(params_type) = function_obj.params_type() {
+        check_fn_args_type(fn_args_type, params_type);
+    }
+
+    let fn_output = create_output_obj(
+        function_obj.call(&fn_args_value),
+        function_obj.return_type(),
+    );
+
+    Ok(fn_output)
 }
 
 pub fn get_fn_obj(fn_name: &str) -> Box<dyn EngineFunction> {
@@ -53,7 +54,7 @@ fn check_fn_args_type(inputs: Vec<ValueType>, fn_args: Vec<ValueType>) {
         .for_each(|(fn_arg, input)| {
             if fn_arg != input {
                 panic!(
-                    "[Incorrect input type] expected '{:?}', received '{:?}'.",
+                    "[InvalidInputType] Expected '{:?}', received '{:?}'.",
                     fn_arg, input
                 );
             }
