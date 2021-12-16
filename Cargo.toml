@@ -12,4 +12,4 @@ authors = ["pultzlucas"]
 
 [dependencies]
 regex = "1.5.4"
-engine_functions = {path = "engine_functions"}
+engine_functions = {path = "engine_functions", version = "*"}
