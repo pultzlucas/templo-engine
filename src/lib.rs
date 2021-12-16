@@ -7,13 +7,11 @@ use std::io::Error;
 use regex::{Captures, Regex};
 
 mod function_call;
-mod functions;
 mod generator;
 mod lexer;
 mod parser;
 mod syntax_tree;
 mod token;
-mod utils;
 
 /// Inserts variables into input text and returns it as result.
 ///

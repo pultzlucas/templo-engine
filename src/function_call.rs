@@ -1,66 +1,37 @@
-use crate::functions::{EngineFunction, GetChar, GetIndex, Join, Lower, Upper, UpperFirst};
-use crate::syntax_tree::{SyntaxTree, TreeType, TreeValueType};
-use crate::utils::errors::invalid_input_error;
+use crate::syntax_tree::{SyntaxTree, TreeType};
+use engine_functions::{
+    EngineFunction, GetChar, GetIndex, Join, Lower, Upper, UpperFirst, ValueType,
+};
 use std::io::Error;
 
-#[derive(Debug)]
-pub struct FunctionCall {
-    pub function: String,
-    pub args: Vec<SyntaxTree>,
-}
+pub fn call_eng_fn(function_name: String, args: Vec<SyntaxTree>) -> Result<SyntaxTree, Error> {
+    let mut fn_args_value: Vec<String> = vec![];
+    let mut fn_args_type: Vec<ValueType> = vec![];
+    for arg in args.clone().into_iter() {
+        fn_args_type.push(arg.tree_val_type);
+        fn_args_value.push(arg.node)
+    }
 
-impl FunctionCall {
-    pub fn call(&self) -> Result<SyntaxTree, Error> {
-        let mut fn_args_value: Vec<String> = vec![];
-        let mut fn_args_type: Vec<TreeValueType> = vec![];
-        for arg in self.args.clone().into_iter() {
-            fn_args_type.push(arg.tree_val_type);
-            fn_args_value.push(arg.node)
+    let exec_fn = |function: Box<dyn EngineFunction>| {
+        if let Some(params_type) = function.params_type() {
+            check_fn_args_type(fn_args_type, params_type);
         }
+        create_output_obj(function.call(&fn_args_value), function.return_type())
+    };
 
-        let exec_fn = |function: &dyn EngineFunction| {
-            if let Some(params_type) = function.params_type() {
-                check_fn_args_type(fn_args_type, params_type);
-            }
+    let function_obj = get_fn_obj(&function_name);
 
-            create_output_obj(function.call(&fn_args_value), function.return_type())
-        };
-
-        let res = match self.function.to_lowercase().as_str() {
-            "upper" => exec_fn(&Upper),
-            "lower" => exec_fn(&Lower),
-            "upper_first" => exec_fn(&UpperFirst),
-            "join" => exec_fn(&Join),
-            "get_char" => exec_fn(&GetChar),
-            "get_index" => exec_fn(&GetIndex),
-            _ => return Err(invalid_input_error("Wrong engine function.")),
-        };
-
-        Ok(res)
+    if args.len() > function_obj.params_quant() {
+        panic!(
+            "[ParamsQuantExceeded] Function '{}' expected '{}' parameters, received '{}'",
+            function_name,
+            function_obj.params_quant(),
+            args.len()
+        );
     }
-}
 
-fn check_fn_args_type(inputs: Vec<TreeValueType>, fn_args: Vec<TreeValueType>) {
-    fn_args
-        .into_iter()
-        .zip(inputs.into_iter())
-        .for_each(|(fn_arg, input)| {
-            if fn_arg != input {
-                panic!(
-                    "[Incorrect input type] expected '{:?}', received '{:?}'.",
-                    fn_arg, input
-                );
-            }
-        })
-}
-
-fn create_output_obj(node: String, tree_val_type: TreeValueType) -> SyntaxTree {
-    SyntaxTree {
-        childs: vec![],
-        node,
-        tree_type: TreeType::Input,
-        tree_val_type,
-    }
+    let res = exec_fn(function_obj);
+    Ok(res)
 }
 
 pub fn get_fn_obj(fn_name: &str) -> Box<dyn EngineFunction> {
@@ -75,6 +46,29 @@ pub fn get_fn_obj(fn_name: &str) -> Box<dyn EngineFunction> {
     }
 }
 
+fn check_fn_args_type(inputs: Vec<ValueType>, fn_args: Vec<ValueType>) {
+    fn_args
+        .into_iter()
+        .zip(inputs.into_iter())
+        .for_each(|(fn_arg, input)| {
+            if fn_arg != input {
+                panic!(
+                    "[Incorrect input type] expected '{:?}', received '{:?}'.",
+                    fn_arg, input
+                );
+            }
+        })
+}
+
+fn create_output_obj(node: String, tree_val_type: ValueType) -> SyntaxTree {
+    SyntaxTree {
+        childs: vec![],
+        node,
+        tree_type: TreeType::Input,
+        tree_val_type,
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -85,20 +79,16 @@ mod test {
             childs: vec![],
             node: String::from("Templo"),
             tree_type: TreeType::Input,
-            tree_val_type: TreeValueType::String,
+            tree_val_type: ValueType::String,
         }];
 
-        let fc = FunctionCall {
-            function: "upper".to_string(),
-            args,
-        };
         assert_eq!(
-            fc.call().unwrap(),
+            call_eng_fn(String::from("upper"), args).unwrap(),
             SyntaxTree {
                 childs: vec![],
                 node: String::from("TEMPLO"),
                 tree_type: TreeType::Input,
-                tree_val_type: TreeValueType::String
+                tree_val_type: ValueType::String
             }
         );
     }
@@ -110,28 +100,23 @@ mod test {
                 childs: vec![],
                 node: String::from("Templo Moon"),
                 tree_type: TreeType::Input,
-                tree_val_type: TreeValueType::String,
+                tree_val_type: ValueType::String,
             },
             SyntaxTree {
                 childs: vec![],
                 node: String::from(" "),
                 tree_type: TreeType::Input,
-                tree_val_type: TreeValueType::String,
+                tree_val_type: ValueType::String,
             },
         ];
 
-        let fc = FunctionCall {
-            function: "join".to_string(),
-            args,
-        };
-
         assert_eq!(
-            fc.call().unwrap(),
+            call_eng_fn(String::from("join"), args).unwrap(),
             SyntaxTree {
                 childs: vec![],
                 node: String::from("TemploMoon"),
                 tree_type: TreeType::Input,
-                tree_val_type: TreeValueType::String,
+                tree_val_type: ValueType::String,
             },
         );
     }
@@ -139,11 +124,7 @@ mod test {
     #[test]
     #[should_panic]
     fn function_call_test3() {
-        let fc = FunctionCall {
-            function: "lower".to_string(),
-            args: vec![],
-        };
-        assert!(fc.call().is_err());
+        assert!(call_eng_fn(String::from("lower"), vec![]).is_err());
     }
 
     #[test]
@@ -152,20 +133,16 @@ mod test {
             childs: vec![],
             node: String::from("Templo Sun"),
             tree_type: TreeType::Input,
-            tree_val_type: TreeValueType::String,
+            tree_val_type: ValueType::String,
         }];
 
-        let fc = FunctionCall {
-            function: "lower".to_string(),
-            args,
-        };
         assert_eq!(
-            fc.call().unwrap(),
+            call_eng_fn(String::from("lower"), args).unwrap(),
             SyntaxTree {
                 childs: vec![],
                 node: String::from("templo sun"),
                 tree_type: TreeType::Input,
-                tree_val_type: TreeValueType::String,
+                tree_val_type: ValueType::String,
             }
         );
     }
@@ -173,41 +150,38 @@ mod test {
     #[test]
     fn function_call_test5() {
         let input = "Templo Sun";
-        let lower = FunctionCall {
-            function: "lower".to_string(),
-            args: vec![SyntaxTree {
-                childs: vec![],
-                node: input.to_string(),
-                tree_type: TreeType::Input,
-                tree_val_type: TreeValueType::String,
-            }],
+        let input_tree = SyntaxTree {
+            childs: vec![],
+            node: input.to_string(),
+            tree_type: TreeType::Input,
+            tree_val_type: ValueType::String,
         };
 
-        let join = FunctionCall {
-            function: "join".to_string(),
-            args: vec![
-                lower.call().unwrap(),
+        let lower_res = call_eng_fn(String::from("lower"), vec![input_tree]).unwrap();
+        let join_res = call_eng_fn(
+            String::from("join"),
+            vec![
+                lower_res,
                 SyntaxTree {
                     childs: vec![],
                     node: String::from(" "),
                     tree_type: TreeType::Input,
-                    tree_val_type: TreeValueType::String,
+                    tree_val_type: ValueType::String,
                 },
             ],
-        };
+        )
+        .unwrap();
 
-        let upper_first = FunctionCall {
-            function: "upper_first".to_string(),
-            args: vec![join.call().unwrap()],
-        };
+        let final_result = call_eng_fn(String::from("upper_first"), vec![join_res]).unwrap();
 
-        let final_result = upper_first.call().unwrap();
-
-        assert_eq!(final_result,  SyntaxTree {
-            childs: vec![],
-            node: String::from("Templosun"),
-            tree_type: TreeType::Input,
-            tree_val_type: TreeValueType::String,
-        },);
+        assert_eq!(
+            final_result,
+            SyntaxTree {
+                childs: vec![],
+                node: String::from("Templosun"),
+                tree_type: TreeType::Input,
+                tree_val_type: ValueType::String,
+            },
+        );
     }
 }

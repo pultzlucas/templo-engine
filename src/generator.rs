@@ -1,5 +1,5 @@
 use crate::{
-    function_call::FunctionCall,
+    function_call::call_eng_fn,
     syntax_tree::{SyntaxTree, TreeType},
 };
 use std::io::Error;
@@ -27,12 +27,5 @@ fn execute_fn_tree(tree: &SyntaxTree) -> Result<SyntaxTree, Error> {
         }
     }
 
-    let function = FunctionCall {
-        function: tree.node.clone(),
-        args,
-    };
-
-    // println!("{:?}", function);
-
-    function.call()
+    call_eng_fn(tree.node.clone(), args)
 }

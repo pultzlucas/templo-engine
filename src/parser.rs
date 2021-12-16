@@ -1,10 +1,10 @@
-use std::vec;
-
+use engine_functions::ValueType;
 use regex::Regex;
+use std::vec;
 
 use crate::{
     function_call::get_fn_obj,
-    syntax_tree::{SyntaxTree, TreeType, TreeValueType},
+    syntax_tree::{SyntaxTree, TreeType},
     token::{Token, TokenType},
     EngineArg, EngineArgType,
 };
@@ -32,7 +32,7 @@ pub fn parse_input_exp(token: &Token, inputs: &Vec<EngineArg>) -> SyntaxTree {
         childs: vec![],
         node: input_value.unwrap().value.clone(),
         tree_type: TreeType::Input,
-        tree_val_type: TreeValueType::String,
+        tree_val_type: ValueType::String,
     }
 }
 
@@ -43,7 +43,7 @@ pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<EngineArg>) -> SyntaxTree {
         tokens_iter.next().unwrap().value.clone(),
         TreeType::FunctionCall,
         vec![],
-        TreeValueType::String,
+        ValueType::String,
     );
 
     let mut layer = 0;
@@ -79,8 +79,8 @@ pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<EngineArg>) -> SyntaxTree {
             let input_value = input_value.unwrap();
 
             let input_type = match input_value.value_type {
-                EngineArgType::String => TreeValueType::String,
-                EngineArgType::Integer => TreeValueType::Integer,
+                EngineArgType::String => ValueType::String,
+                EngineArgType::Integer => ValueType::Integer,
             };
 
             let input = SyntaxTree::new(
@@ -98,7 +98,7 @@ pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<EngineArg>) -> SyntaxTree {
                 token.value.clone(),
                 TreeType::Input,
                 vec![],
-                TreeValueType::Integer,
+                ValueType::Integer,
             );
             tree.append_child(input);
             layer_args[layer].args += 1;
@@ -113,7 +113,7 @@ pub fn parse_fn_exp(tokens: Vec<Token>, inputs: &Vec<EngineArg>) -> SyntaxTree {
                 real_string_value.to_string(),
                 TreeType::Input,
                 vec![],
-                TreeValueType::String,
+                ValueType::String,
             );
 
             tree.append_child(input);

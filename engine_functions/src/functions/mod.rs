@@ -16,4 +16,11 @@ pub trait EngineFunction: Debug {
     }
 
     fn params_type(&self) -> Option<Vec<ValueType>>;
+    fn params_quant(&self) -> usize {
+        if let Some(params) = self.params_type() {
+            params.len()
+        } else {
+            0
+        }
+    }
 }
